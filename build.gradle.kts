@@ -1,47 +1,53 @@
-plugins {
-  id("java")
-  id("org.jetbrains.kotlin.jvm") version "1.9.0"
-  id("org.jetbrains.intellij") version "1.15.0"
-}
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+    plugins {
+      java
+      kotlin("jvm") version "2.2.0"
+      id("org.jetbrains.intellij.platform") version "2.10.5"
+    }
 
 group = "com.ofya"
-version = "2025-05-01"
+version = "2026-01-09"
 
 repositories {
   mavenCentral()
+
+  intellijPlatform {
+    defaultRepositories()
+  }
 }
 
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-  version.set("2022.2.5")
-  type.set("IC") // Target IDE Platform
+dependencies {
+  intellijPlatform {
+    intellijIdea("2025.3")
+    bundledPlugin("com.intellij.java")
+  }
+}
 
-  plugins.set(listOf(/* Plugin Dependencies */))
+
+java {
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(17))
+  }
 }
 
 tasks {
-  // Set the JVM compatibility versions
-  withType<JavaCompile> {
-    sourceCompatibility = "17"
-    targetCompatibility = "17"
-  }
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
   }
 
   patchPluginXml {
-    sinceBuild.set("222")
-    untilBuild.set("252.*")
+    sinceBuild.set("253")
+    untilBuild.set("253.*")
   }
 
   signPlugin {
-    certificateChainFile.set(file("../../Keys/chain.crt"))
-    privateKeyFile.set(file("../../Keys/private.pem"))
-    password.set(System.getenv("PRIVATE_KEY_PASS"))
+    certificateChainFile.set(file("../keys/chain.crt"))
+    privateKeyFile.set(file("../keys/private.pem"))
+    password.set("nope")
   }
 
   publishPlugin {
-    token.set(System.getenv("PUBLISH_TOKEN"))
+    token.set("nope")
   }
 }
